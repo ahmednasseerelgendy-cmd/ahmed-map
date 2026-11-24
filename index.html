@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>خريطة أعمال المهندس أحمد ناصر</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0b1c28;--glass:rgba(11,28,40,.88);--line:rgba(255,255,255,.14);--accent:#ffb23e;--accent2:#ffd08a;--txt:#eef4f8;--mut:#9db3c4;--danger:#ff6464;--ok:#3ddc97}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0;font-family:'Cairo',system-ui,-apple-system,'Segoe UI',Tahoma,sans-serif;background:var(--ink);color:var(--txt)}
+#map{position:absolute;inset:0;z-index:0;background:#0b1c28}
+.leaflet-container{font-family:inherit}
+.mut{color:var(--mut)}.sm{font-size:12.5px}
+button{font-family:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+#nav{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);z-index:1200;display:flex;gap:4px;padding:6px;background:var(--glass);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:999px;box-shadow:0 10px 34px rgba(0,0,0,.45)}
+#nav button{display:flex;align-items:center;gap:8px;border:0;background:transparent;color:var(--txt);padding:9px 16px;border-radius:999px;cursor:pointer;font-weight:600;font-size:14px;white-space:nowrap;transition:background .2s,color .2s}
+#nav button svg{width:20px;height:20px}
+#nav button:hover,#nav button.on{background:var(--accent);color:#231600}
+
+#handle{position:fixed;top:0;right:18px;z-index:1250;display:flex;align-items:center;gap:8px;padding:8px 16px 10px;border:1px solid var(--line);border-top:0;border-radius:0 0 16px 16px;background:var(--glass);backdrop-filter:blur(8px);color:var(--txt);cursor:pointer;opacity:.55;font-weight:600;font-size:13px;transition:opacity .25s}
+#handle:hover,#handle.open{opacity:1}
+#handle svg{transition:transform .35s}
+#handle.open svg:last-child{transform:rotate(180deg)}
+#panel{position:fixed;top:42px;right:12px;width:min(352px,calc(100vw - 24px));max-height:calc(100vh - 150px);overflow:auto;z-index:1240;background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,.5);transform:translateY(calc(-100% - 60px));opacity:0;pointer-events:none;transition:transform .55s cubic-bezier(.2,.85,.25,1),opacity .35s}
+#panel.open{transform:none;opacity:1;pointer-events:auto}
+.who{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.who h1{margin:0;font-size:25px;font-weight:800;line-height:1.35;color:var(--accent);flex:1}
+.badge{display:inline-block;margin:-4px 0 12px;padding:3px 10px;border-radius:999px;background:rgba(61,220,151,.14);color:var(--ok);font-size:12px;font-weight:600}
+.sec{border:1px solid var(--line);border-radius:14px;margin-bottom:10px;overflow:hidden;background:rgba(255,255,255,.03)}
+.sh{width:100%;display:flex;align-items:center;gap:10px;padding:12px 14px;border:0;background:transparent;color:var(--txt);font-size:15px;font-weight:600;cursor:pointer;text-align:right}
+.sh span{flex:1}
+.sh i{display:flex;transition:transform .3s}
+.sec.open .sh i{transform:rotate(180deg)}
+.sb{display:none;padding:4px 14px 14px;animation:fade .25s}
+.sec.open .sb{display:block}
+.pre{white-space:pre-wrap;line-height:1.8;margin:6px 0}
+.dot{display:block;flex:none;width:20px;height:20px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.35),0 3px 8px rgba(0,0,0,.5)}
+.leaflet-marker-icon .dot{transition:transform .15s}
+.leaflet-marker-icon:hover .dot{transform:scale(1.3)}
+.prow{display:flex;align-items:center;gap:6px;margin-top:6px}
+.pmain{flex:1;display:flex;align-items:center;gap:10px;padding:9px 10px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.04);color:var(--txt);cursor:pointer;font-size:14px;text-align:right}
+.pmain:hover{background:rgba(255,255,255,.09)}
+.pmain .pn{flex:1}
+.pmain i{display:flex;transition:transform .25s}
+.pt.open .pmain i{transform:rotate(180deg)}
+.opts{display:none;gap:8px;padding:8px 4px 2px;animation:fade .2s}
+.pt.open .opts{display:flex}
+.opts button{flex:1;padding:8px;border-radius:10px;border:1px solid var(--accent);background:transparent;color:var(--accent2);cursor:pointer;font-weight:600;font-size:13px}
+.opts button:hover{background:var(--accent);color:#231600}
+.addrow{display:flex;align-items:center;gap:12px;margin:4px 0 6px}
+.addbtn{width:46px;height:46px;border-radius:50%;border:0;background:var(--accent);color:#231600;cursor:pointer;display:grid;place-items:center;box-shadow:0 6px 16px rgba(255,178,62,.35)}
+.addbtn svg{width:24px;height:24px;stroke-width:2.6}
+.addbtn:hover{transform:scale(1.06)}
+.otools{margin-top:14px;padding-top:14px;border-top:1px dashed var(--line);display:flex;flex-direction:column;gap:10px}
+.lbl{font-weight:700;font-size:13px;color:var(--accent2)}
+.cvrow{display:flex;align-items:center;gap:8px;font-size:13px}
+.cvrow span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row2{display:flex;gap:8px}.row2>*{flex:1}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--txt);cursor:pointer;font-weight:600;font-size:14px}
+.btn:hover{background:rgba(255,255,255,.12)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#231600}
+.btn.pri:hover{background:var(--accent2)}
+.btn.dng{border-color:var(--danger);color:var(--danger);background:transparent}
+.btn.dng:hover{background:var(--danger);color:#fff}
+.btn.ghost{background:transparent}
+.btn.sm{padding:7px 12px;font-size:13px}
+.ib{flex:none;display:inline-grid;place-items:center;width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--txt);cursor:pointer}
+.ib:hover{background:var(--accent);color:#231600;border-color:var(--accent)}
+.ib.pri{background:var(--accent);color:#231600;border-color:var(--accent)}
+.ib.dng:hover{background:var(--danger);border-color:var(--danger);color:#fff}
+
+#basemaps{position:fixed;top:92px;left:10px;z-index:1100;display:flex;flex-direction:column;gap:8px}
+.bmw{position:relative}
+.bm{position:relative;width:44px;height:44px;padding:0;border-radius:11px;border:2px solid rgba(255,255,255,.55);cursor:pointer;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.45);transition:transform .15s,border-color .15s}
+.bm:hover{transform:scale(1.08)}
+.bm.on{border-color:var(--accent);box-shadow:0 0 0 2px rgba(255,178,62,.45),0 4px 12px rgba(0,0,0,.45)}
+.bm b{position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:13px;text-shadow:0 1px 3px #000}
+.tip{position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);white-space:nowrap;background:var(--glass);color:var(--txt);padding:4px 10px;border-radius:8px;font-size:12px;opacity:0;pointer-events:none;transition:opacity .15s}
+.bmw:hover .tip{opacity:1}
+
+.ov{position:fixed;inset:0;z-index:2000;background:rgba(3,10,18,.62);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:14px;animation:fade .2s}
+.dlg{position:relative;width:min(560px,100%);max-height:92vh;overflow:auto;background:linear-gradient(180deg,#16303f,#0e2230);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 30px 80px rgba(0,0,0,.6);animation:pop .28s cubic-bezier(.2,.9,.3,1.15)}
+.dlg.sm{width:min(400px,100%)}.dlg.wide{width:min(660px,100%)}.dlg.xl{width:min(920px,100%)}
+.dlg .x{position:absolute;top:14px;left:14px;width:32px;height:32px;border-radius:50%;border:0;background:rgba(255,255,255,.08);color:var(--txt);cursor:pointer;display:grid;place-items:center}
+.dlg .x:hover{background:var(--danger)}
+.dlg h2{margin:0 0 16px;font-size:20px;display:flex;align-items:center;gap:10px;padding-left:38px}
+.tbl{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.tbl th{width:32%;background:rgba(255,178,62,.12);color:var(--accent2);text-align:right;font-weight:700;vertical-align:top;padding:12px;border-bottom:1px solid var(--line);border-left:1px solid var(--line)}
+.tbl td{padding:12px;border-bottom:1px solid var(--line);vertical-align:top;word-break:break-word}
+.tbl tr:last-child th,.tbl tr:last-child td{border-bottom:0}
+.atts{display:flex;flex-direction:column;gap:8px}
+.att{display:flex;align-items:center;gap:10px;padding:8px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.04)}
+.att .th{flex:none;width:46px;height:46px;border-radius:9px;background:rgba(255,178,62,.15);display:grid;place-items:center;overflow:hidden;color:var(--accent2);font-size:12px}
+.att .th[data-view]{cursor:zoom-in}
+.att img{width:100%;height:100%;object-fit:cover}
+.att .ai{flex:1;min-width:0}
+.att .an{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
+.form{display:flex;flex-direction:column;gap:12px;margin-bottom:12px}
+.form label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:var(--accent2)}
+.form input:not([type=checkbox]):not([type=color]),.form textarea,.form select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:rgba(0,0,0,.28);color:var(--txt);font:inherit;font-size:15px}
+.form textarea{resize:vertical}
+.form .chk{flex-direction:row;align-items:center;gap:8px;color:var(--mut);font-weight:400}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sw{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.swb{width:28px;height:28px;border-radius:50%;border:3px solid transparent;cursor:pointer}
+.swb.on{border-color:#fff}
+.sw input[type=color]{width:34px;height:30px;padding:0;border:0;background:none;cursor:pointer}
+.acts{display:flex;gap:10px;justify-content:flex-start;margin-top:16px;flex-wrap:wrap}
+.err{color:var(--danger);font-size:13px;min-height:18px}
+.seg{display:flex;gap:6px;padding:4px;border-radius:12px;background:rgba(0,0,0,.28);margin-bottom:14px}
+.seg button{flex:1;padding:9px 8px;border:0;border-radius:9px;background:transparent;color:var(--mut);cursor:pointer;font-weight:600;font-size:13.5px}
+.seg button.on{background:var(--accent);color:#231600}
+.cvbar{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.cvbar .an{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cvview{min-height:200px;max-height:68vh;overflow:auto;border-radius:12px;background:#fff;color:#111}
+.cvview iframe{display:block;width:100%;height:68vh;border:0}
+.cvview.doc{padding:22px;line-height:1.8}
+.lb{display:block;max-width:100%;max-height:80vh;margin:auto;border-radius:10px}
+#toast{position:fixed;bottom:92px;left:50%;transform:translate(-50%,20px);z-index:3000;max-width:min(520px,92vw);padding:11px 18px;border-radius:12px;background:#1d3a4d;border:1px solid var(--line);color:var(--txt);font-size:14px;opacity:0;pointer-events:none;transition:.3s;text-align:center}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+.shake{animation:shake .35s}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes pop{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@media(max-width:720px){#nav button span{display:none}#nav button{padding:11px 14px}#handle span{display:none}.who h1{font-size:22px}.two{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<nav id="nav" aria-label="القائمة الرئيسية"></nav>
+<button id="handle" aria-expanded="false" aria-controls="panel"></button>
+<aside id="panel" aria-label="بيانات الخريطة"></aside>
+<div id="basemaps" aria-label="الخرائط الأساسية"></div>
+<div id="toast" role="status"></div>
+<noscript><p style="position:fixed;top:40%;width:100%;text-align:center">هذه الصفحة تحتاج تفعيل JavaScript.</p></noscript>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.9.2/proj4.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script id="app">
+(function(){
+'use strict';
+
+/* ======== إعدادات الاتصال بـ Supabase (مفاتيح عامة آمنة) ======== */
+var SUPABASE_URL='https://cxlagylqfbptbscixoai.supabase.co';
+var SUPABASE_KEY='sb_publishable_GfGWiTttcY6iyRKGhg_nPw_kCO3RtgY';
+var BUCKET='portfolio';
+/* =============================================================== */
+
+var MAX=20*1024*1024;
+var ATT_RE=/\.(jpe?g|png|gif|webp|dwg|xlsx?|csv|sdr|lsp)$/i;
+var ATT_ACCEPT='.jpg,.jpeg,.png,.gif,.webp,.dwg,.xlsx,.xls,.csv,.sdr,.lsp';
+var PALETTE=['#ff6b6b','#4dabf7','#51cf66','#ffd43b','#cc5de8','#ff922b','#20c997','#f06595','#748ffc','#a9e34b','#22b8cf','#e8590c'];
+
+var $=function(s,r){return (r||document).querySelector(s);};
+var esc=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});};
+var uid=function(){return (window.crypto&&crypto.randomUUID)?crypto.randomUUID():Math.random().toString(36).slice(2)+Date.now().toString(36);};
+var ic=function(p){return '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>';};
+var I={
+  pencil:ic('<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>'),
+  plus:ic('<path d="M12 5v14M5 12h14"/>'),
+  chev:ic('<path d="m6 9 6 6 6-6"/>'),
+  trash:ic('<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/>'),
+  down:ic('<path d="M12 3v12m0 0-4-4m4 4 4-4M4 21h16"/>'),
+  lock:ic('<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>'),
+  map:ic('<path d="m9 4-6 2v14l6-2 6 2 6-2V4l-6 2Z"/><path d="M9 4v14M15 6v14"/>'),
+  doc:ic('<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Z"/><path d="M14 3v6h6M8 13h8M8 17h5"/>'),
+  list:ic('<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>'),
+  info:ic('<circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/>'),
+  x:ic('<path d="M18 6 6 18M6 6l12 12"/>'),
+  out:ic('<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>'),
+  ribbon:ic('<path d="M6 3h12v18l-6-4-6 4Z"/>')
+};
+
+var tt;
+function toast(m,ms){var t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(function(){t.classList.remove('on');},ms||3200);}
+
+if(!window.supabase||!window.L){
+  document.body.insertAdjacentHTML('beforeend','<div style="position:fixed;inset:0;z-index:5000;display:grid;place-items:center;background:#0b1c28;padding:20px;text-align:center">تعذّر تحميل مكتبات الصفحة. تأكد من اتصال الإنترنت ثم أعد تحميل الصفحة.</div>');
+  return;
+}
+var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+var owner=false;
+var data={name:'م. أحمد ناصر رشاد',brief:'',cv:null,points:[]};
+
+var pubUrl=function(path){return sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;};
+function ck(res){if(res&&res.error)throw res.error;return res?res.data:null;}
+
+/* ---------- تحميل البيانات ---------- */
+async function load(){
+  try{
+    var r=await Promise.all([
+      sb.from('site_settings').select('*').eq('id',1).maybeSingle(),
+      sb.from('points').select('*').order('created_at'),
+      sb.from('attachments').select('*').order('created_at')
+    ]);
+    var s=ck(r[0])||{},ps=ck(r[1])||[],as=ck(r[2])||[];
+    data.name=s.owner_name||data.name;
+    data.brief=s.brief||'';
+    data.cv=s.cv_path?{path:s.cv_path,name:s.cv_name||'cv',type:s.cv_type||'',url:pubUrl(s.cv_path)}:null;
+    data.points=ps.map(function(p){
+      return {id:p.id,name:p.name,location:p.location,summary:p.summary,color:p.color,lat:p.lat,lng:p.lng,
+        attachments:as.filter(function(a){return a.point_id===p.id;}).map(function(a){return {id:a.id,name:a.name,type:a.type,size:a.size,path:a.path,url:pubUrl(a.path)};})};
+    });
+    refresh();return true;
+  }catch(e){
+    console.error(e);toast('تعذّر تحميل البيانات: '+(e.message||e)+' — تأكد من تشغيل ملف SQL.',8000);return false;
+  }
+}
+function refresh(){drawMarkers();renderPanel();}
+async function run(msg,fn){
+  toast(msg+'…',60000);
+  try{await fn();await load();toast('تم الحفظ ✓');return true;}
+  catch(e){console.error(e);toast('حدث خطأ: '+(e.message||e),8000);return false;}
+}
+async function upload(file,folder){
+  var ex=((file.name.split('.').pop()||'bin').toLowerCase().replace(/[^a-z0-9]/g,'')||'bin').slice(0,8);
+  var path=folder+'/'+uid()+'.'+ex;
+  ck(await sb.storage.from(BUCKET).upload(path,file,{contentType:file.type||'application/octet-stream',upsert:false}));
+  return path;
+}
+async function removeFiles(paths){if(paths&&paths.length)await sb.storage.from(BUCKET).remove(paths);}
+
+/* ---------- أدوات الملفات ---------- */
+var fmt=function(s){return s>1048576?(s/1048576).toFixed(1)+' MB':Math.max(1,Math.round(s/1024))+' KB';};
+var ext=function(n){return (n.split('.').pop()||'').slice(0,4).toUpperCase();};
+var isImg=function(a){return /^image\//.test(a.type)||/\.(jpe?g|png|gif|webp|bmp)$/i.test(a.name);};
+function pick(accept,multiple){return new Promise(function(res){var i=document.createElement('input');i.type='file';i.accept=accept;i.multiple=!!multiple;i.onchange=function(){res([].slice.call(i.files));};i.click();});}
+function saveBlob(blob,name){
+  var url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(function(){URL.revokeObjectURL(url);},4000);
+}
+function dl(a){
+  if(a.file){saveBlob(a.file,a.name);return;}
+  toast('جارٍ تجهيز التحميل…');
+  fetch(a.url).then(function(r){if(!r.ok)throw new Error();return r.blob();}).then(function(b){saveBlob(b,a.name);}).catch(function(){window.open(a.url,'_blank');});
+}
+function addFiles(list,files){
+  files.forEach(function(f){
+    if(!ATT_RE.test(f.name)){toast('نوع الملف غير مدعوم: '+f.name);return;}
+    if(f.size>MAX){toast('الملف أكبر من 20MB: '+f.name,4500);return;}
+    list.push({name:f.name,type:f.type||'',size:f.size,file:f,url:URL.createObjectURL(f)});
+  });
+}
+
+/* ---------- النوافذ ---------- */
+function modal(html,opts){
+  opts=opts||{};
+  var ov=document.createElement('div');ov.className='ov';
+  ov.innerHTML='<div class="dlg '+(opts.cls||'')+'" role="dialog" aria-modal="true"><button class="x" aria-label="إغلاق">'+I.x+'</button>'+html+'</div>';
+  var kd=function(e){if(e.key==='Escape')close();};
+  var close=function(){ov.remove();document.removeEventListener('keydown',kd);if(opts.onClose)opts.onClose();};
+  ov.addEventListener('mousedown',function(e){if(e.target===ov)close();});
+  $('.x',ov).onclick=close;
+  document.addEventListener('keydown',kd);
+  document.body.appendChild(ov);
+  ov.close=close;
+  return ov;
+}
+function ask(title,val,multi){
+  return new Promise(function(res){
+    var done=false;
+    var ov=modal('<h2>'+title+'</h2><div class="form">'+(multi?'<textarea id="q" rows="5">'+esc(val)+'</textarea>':'<input id="q" value="'+esc(val)+'">')+'</div><div class="acts"><button class="btn pri" id="q_ok">حفظ</button></div>',{cls:'sm',onClose:function(){if(!done)res(null);}});
+    var q=$('#q',ov);q.focus();
+    $('#q_ok',ov).onclick=function(){done=true;res(q.value);ov.close();};
+  });
+}
+function lightbox(a){modal('<img class="lb" src="'+esc(a.url)+'" alt="'+esc(a.name)+'">',{cls:'xl'});}
+function attHTML(list,canDel){
+  if(!list.length)return '<span class="mut">لا توجد مرفقات</span>';
+  return '<div class="atts">'+list.map(function(a,i){
+    var img=isImg(a);
+    return '<div class="att"><div class="th"'+(img?' data-view="'+i+'"':'')+'>'+(img?'<img src="'+esc(a.url)+'" alt="" loading="lazy">':'<b>'+esc(ext(a.name))+'</b>')+'</div><div class="ai"><div class="an" dir="auto">'+esc(a.name)+'</div><div class="mut sm">'+fmt(a.size)+(a.file?' — بانتظار الحفظ':'')+'</div></div><button class="ib" data-dl="'+i+'" title="تحميل" aria-label="تحميل">'+I.down+'</button>'+(canDel?'<button class="ib dng" data-del="'+i+'" title="حذف" aria-label="حذف">'+I.trash+'</button>':'')+'</div>';
+  }).join('')+'</div>';
+}
+function wireAtts(root,getList,onDel){
+  root.addEventListener('click',function(e){
+    var b=e.target.closest('[data-dl],[data-del],[data-view]');if(!b)return;
+    var l=getList();
+    if(b.dataset.dl!==undefined)dl(l[+b.dataset.dl]);
+    else if(b.dataset.del!==undefined){if(onDel)onDel(+b.dataset.del);}
+    else if(b.dataset.view!==undefined)lightbox(l[+b.dataset.view]);
+  });
+}
+
+/* ---------- الخريطة (خريطتان فقط) ---------- */
+var map=L.map('map',{zoomControl:false,worldCopyJump:true,zoomSnap:.25,maxZoom:20,minZoom:3}).setView([27,30.5],6);
+map.attributionControl.setPrefix(false);
+L.control.zoom({position:'topleft'}).addTo(map);
+var ESRI='https://server.arcgisonline.com/ArcGIS/rest/services/';
+var imagery=function(){return L.tileLayer(ESRI+'World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:20,maxNativeZoom:18,attribution:'Tiles © Esri'});};
+var labels=function(){return L.tileLayer(ESRI+'Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',{maxZoom:20,maxNativeZoom:17});};
+var BASES={
+  imagery:{l:'صور الأقمار الصناعية',t:'',bg:'linear-gradient(135deg,#2f5233,#6b5b3a 45%,#1f3b57)',mk:function(){return [imagery()];}},
+  imagery_l:{l:'صور الأقمار الصناعية + أسماء',t:'Aa',bg:'linear-gradient(135deg,#2f5233,#6b5b3a 45%,#1f3b57)',mk:function(){return [imagery(),labels()];}}
+};
+var baseLayers=[];
+function setBase(k){
+  baseLayers.forEach(function(l){map.removeLayer(l);});
+  baseLayers=BASES[k].mk();
+  baseLayers.forEach(function(l){l.addTo(map);});
+  document.querySelectorAll('.bm').forEach(function(b){b.classList.toggle('on',b.dataset.k===k);});
+}
+$('#basemaps').innerHTML=Object.keys(BASES).map(function(k){
+  var b=BASES[k];
+  return '<div class="bmw"><button class="bm" data-k="'+k+'" title="'+b.l+'" aria-label="'+b.l+'" style="background:'+b.bg+'">'+(b.t?'<b>'+b.t+'</b>':'')+'</button><span class="tip">'+b.l+'</span></div>';
+}).join('');
+$('#basemaps').addEventListener('click',function(e){var b=e.target.closest('.bm');if(b)setBase(b.dataset.k);});
+
+var group=L.layerGroup().addTo(map);
+function mkIcon(c){return L.divIcon({className:'',html:'<span class="dot" style="background:'+esc(c)+'"></span>',iconSize:[20,20],iconAnchor:[10,10]});}
+function drawMarkers(){
+  group.clearLayers();
+  data.points.forEach(function(p){
+    var m=L.marker([p.lat,p.lng],{icon:mkIcon(p.color),title:p.name,keyboard:true}).addTo(group);
+    m.bindTooltip(esc(p.name),{direction:'top',offset:[0,-12]});
+    m.on('click',function(){showDetails(p.id);});
+  });
+}
+function fitAll(animate){
+  if(!data.points.length)return;
+  var b=L.latLngBounds(data.points.map(function(p){return [p.lat,p.lng];}));
+  var o={padding:[90,90],maxZoom:9};
+  if(animate)map.flyToBounds(b,Object.assign({duration:2.2},o));else map.fitBounds(b,o);
+}
+function goTo(id){
+  var p=data.points.find(function(x){return x.id===id;});if(!p)return;
+  map.flyTo([p.lat,p.lng],17,{duration:3.2,easeLinearity:.15});
+  if(window.innerWidth<720)setPanel(false);
+}
+
+/* ---------- الإحداثيات ---------- */
+var CRS={
+  utm36:{l:'UTM Zone 36N — WGS84 (الفيوم/القاهرة/الصعيد/سيناء)',d:'+proj=utm +zone=36 +datum=WGS84 +units=m +no_defs'},
+  utm35:{l:'UTM Zone 35N — WGS84 (الإسكندرية/مطروح)',d:'+proj=utm +zone=35 +datum=WGS84 +units=m +no_defs'},
+  utm37:{l:'UTM Zone 37N — WGS84 (شرق مصر)',d:'+proj=utm +zone=37 +datum=WGS84 +units=m +no_defs'},
+  red:{l:'Egypt Red Belt (EPSG:22992)',d:'+proj=tmerc +lat_0=30 +lon_0=31 +k=1 +x_0=615000 +y_0=810000 +ellps=helmert +towgs84=-130,110,-13,0,0,0,0 +units=m +no_defs'}
+};
+function parseGE(s){
+  s=s.trim().replace(/[،;]/g,',');
+  var re=/(\d+(?:\.\d+)?)\s*[°º]\s*(?:(\d+(?:\.\d+)?)\s*['′’]\s*)?(?:(\d+(?:\.\d+)?)\s*(?:"|″|”|''|’’)\s*)?([NSEWnsew])?/g;
+  var dms=[],m,a,b;
+  while((m=re.exec(s)))dms.push(m);
+  if(dms.length>=2){
+    var conv=function(m){var v=+m[1]+(+m[2]||0)/60+(+m[3]||0)/3600,h=(m[4]||'').toUpperCase();if(h==='S'||h==='W')v=-v;return {v:v,h:h};};
+    var A=conv(dms[0]),B=conv(dms[1]);
+    if(A.h==='E'||A.h==='W'||B.h==='N'||B.h==='S'){a=B.v;b=A.v;}else{a=A.v;b=B.v;}
+  }else{
+    var nums=s.match(/-?\d+(?:\.\d+)?/g);
+    if(!nums||nums.length<2)return null;
+    var hs=(s.match(/[NSEWnsew]/g)||[]).map(function(x){return x.toUpperCase();});
+    a=+nums[0];b=+nums[1];
+    if(hs.length>=2){
+      if(hs[0]==='S'||hs[0]==='W')a=-Math.abs(a);
+      if(hs[1]==='S'||hs[1]==='W')b=-Math.abs(b);
+      if(hs[0]==='E'||hs[0]==='W'){var t=a;a=b;b=t;}
+    }
+  }
+  if(!isFinite(a)||!isFinite(b)||Math.abs(a)>90||Math.abs(b)>180)return null;
+  return {lat:a,lng:b};
+}
+
+/* ---------- عرض التفاصيل ---------- */
+function showDetails(id){
+  var p=data.points.find(function(x){return x.id===id;});if(!p)return;
+  var ov=modal('<h2><span class="dot" style="background:'+esc(p.color)+'"></span>'+esc(p.name)+'</h2>'+
+  '<table class="tbl"><tbody>'+
+  '<tr><th>اسم المشروع / الموقع</th><td>'+esc(p.name)+'</td></tr>'+
+  '<tr><th>الموقع</th><td>'+esc(p.location||'—')+'<div class="mut sm"><bdi>'+p.lat.toFixed(6)+', '+p.lng.toFixed(6)+'</bdi></div></td></tr>'+
+  '<tr><th>المرفقات</th><td>'+attHTML(p.attachments,false)+'</td></tr>'+
+  '<tr><th>موجز للمشروع</th><td class="pre">'+esc(p.summary||'—')+'</td></tr>'+
+  '</tbody></table>');
+  wireAtts($('.dlg',ov),function(){return p.attachments;});
+}
+
+/* ---------- تعديل نقطة (المالك) ---------- */
+function editPoint(id){
+  var orig=data.points.find(function(x){return x.id===id;});if(!orig)return;
+  var p=JSON.parse(JSON.stringify(orig)),removed=[];
+  var sw=PALETTE.map(function(c){return '<button type="button" class="swb'+(c===p.color?' on':'')+'" data-c="'+c+'" style="background:'+c+'" aria-label="لون"></button>';}).join('')+'<input type="color" id="e_col" value="'+esc(p.color)+'" aria-label="لون مخصص">';
+  var ov=modal('<h2>'+I.pencil+' تعديل النقطة</h2><div class="form">'+
+    '<label>اسم المشروع / الموقع<input id="e_name" value="'+esc(p.name)+'"></label>'+
+    '<label>الموقع<input id="e_loc" value="'+esc(p.location)+'"></label>'+
+    '<label>موجز للمشروع<textarea id="e_sum" rows="4">'+esc(p.summary)+'</textarea></label>'+
+    '<div class="two"><label>خط العرض (Lat)<input id="e_lat" type="number" step="any" dir="ltr" value="'+p.lat+'"></label><label>خط الطول (Lng)<input id="e_lng" type="number" step="any" dir="ltr" value="'+p.lng+'"></label></div>'+
+    '<div class="lbl">لون النقطة</div><div class="sw" id="e_sw">'+sw+'</div>'+
+    '<div class="lbl">المرفقات (صور، DWG، Excel، CSV، SDR، LSP — حتى 20MB للملف)</div><div id="e_att"></div>'+
+    '<button type="button" class="btn ghost" id="e_add">'+I.plus+' إضافة مرفقات</button></div>'+
+    '<div class="err" id="e_err"></div>'+
+    '<div class="acts"><button class="btn pri" id="e_ok">حفظ التعديلات</button><button class="btn dng" id="e_del">'+I.trash+' حذف النقطة</button></div>',{cls:'wide'});
+  var drawAtt=function(){$('#e_att',ov).innerHTML=attHTML(p.attachments,true);};
+  drawAtt();
+  wireAtts($('#e_att',ov),function(){return p.attachments;},function(i){var a=p.attachments.splice(i,1)[0];if(a.id)removed.push(a);drawAtt();});
+  $('#e_add',ov).onclick=function(){pick(ATT_ACCEPT,true).then(function(fs){addFiles(p.attachments,fs);drawAtt();});};
+  $('#e_sw',ov).addEventListener('click',function(e){
+    var b=e.target.closest('.swb');if(!b)return;
+    p.color=b.dataset.c;$('#e_col',ov).value=p.color;
+    ov.querySelectorAll('.swb').forEach(function(x){x.classList.toggle('on',x===b);});
+  });
+  $('#e_col',ov).oninput=function(e){p.color=e.target.value;ov.querySelectorAll('.swb').forEach(function(x){x.classList.remove('on');});};
+  $('#e_ok',ov).onclick=function(){
+    var lat=parseFloat($('#e_lat',ov).value),lng=parseFloat($('#e_lng',ov).value);
+    if(!isFinite(lat)||!isFinite(lng)||Math.abs(lat)>90||Math.abs(lng)>180){$('#e_err',ov).textContent='الإحداثيات غير صالحة.';return;}
+    var row={name:$('#e_name',ov).value.trim()||'نقطة بدون اسم',location:$('#e_loc',ov).value.trim(),summary:$('#e_sum',ov).value.trim(),color:p.color,lat:lat,lng:lng};
+    ov.close();
+    run('جارٍ حفظ النقطة والمرفقات',async function(){
+      ck(await sb.from('points').update(row).eq('id',id));
+      for(var a of removed){ck(await sb.from('attachments').delete().eq('id',a.id));await removeFiles([a.path]);}
+      for(var n of p.attachments){
+        if(!n.file)continue;
+        var path=await upload(n.file,'points/'+id);
+        ck(await sb.from('attachments').insert({point_id:id,name:n.name,type:n.type,size:n.size,path:path}));
+      }
+    });
+  };
+  $('#e_del',ov).onclick=function(){
+    if(!confirm('حذف هذه النقطة نهائيًا مع مرفقاتها؟'))return;
+    var paths=orig.attachments.map(function(a){return a.path;});
+    ov.close();
+    run('جارٍ الحذف',async function(){ck(await sb.from('points').delete().eq('id',id));await removeFiles(paths);});
+  };
+}
+
+/* ---------- إضافة نقطة (المالك) ---------- */
+function addPoint(){
+  var mode='ge';
+  var ov=modal('<h2>'+I.plus+' إضافة نقطة</h2>'+
+  '<div class="seg"><button type="button" data-m="ge" class="on">إحداثيات Google Earth</button><button type="button" data-m="xy">إحداثيات X , Y</button></div>'+
+  '<div id="m_ge" class="form"><label>الصق الإحداثيات (خط العرض ثم خط الطول)<input id="a_ge" dir="ltr" placeholder="29.3084, 30.8428"></label><div class="mut sm">تدعم الصيغة العشرية أو درجات/دقائق/ثواني كما تُنسخ من Google Earth.</div></div>'+
+  '<div id="m_xy" class="form" hidden><label>نظام الإحداثيات<select id="a_crs">'+Object.keys(CRS).map(function(k){return '<option value="'+k+'">'+CRS[k].l+'</option>';}).join('')+'</select></label>'+
+  '<div class="two"><label>X (شرقيات — Easting)<input id="a_x" type="number" step="any" dir="ltr"></label><label>Y (شمالية — Northing)<input id="a_y" type="number" step="any" dir="ltr"></label></div>'+
+  '<label class="chk"><input type="checkbox" id="a_sw"> الملف مكتوب بترتيب Y ثم X (تبديل القيمتين)</label></div>'+
+  '<div class="form"><label>اسم النقطة (اختياري)<input id="a_name"></label></div>'+
+  '<div class="err" id="a_err"></div>'+
+  '<div class="acts"><button class="btn pri" id="a_ok">ok</button></div>',{cls:'sm'});
+  ov.querySelectorAll('.seg button').forEach(function(b){b.onclick=function(){
+    mode=b.dataset.m;
+    ov.querySelectorAll('.seg button').forEach(function(x){x.classList.toggle('on',x===b);});
+    $('#m_ge',ov).hidden=mode!=='ge';$('#m_xy',ov).hidden=mode!=='xy';
+  };});
+  $('#a_ge',ov).focus();
+  $('#a_ok',ov).onclick=async function(){
+    var err=$('#a_err',ov),lat,lng;err.textContent='';
+    if(mode==='ge'){
+      var r=parseGE($('#a_ge',ov).value);
+      if(!r){err.textContent='تعذّر قراءة الإحداثيات. مثال: 29.3084, 30.8428';return;}
+      lat=r.lat;lng=r.lng;
+    }else{
+      var xs=$('#a_x',ov).value,ys=$('#a_y',ov).value;
+      if(xs===''||ys===''){err.textContent='أدخل قيمتي X و Y.';return;}
+      var x=+xs,y=+ys;if($('#a_sw',ov).checked){var t=x;x=y;y=t;}
+      try{var o=proj4(CRS[$('#a_crs',ov).value].d,'WGS84',[x,y]);lng=o[0];lat=o[1];}catch(e){err.textContent='تعذّر تحويل الإحداثيات.';return;}
+      if(!isFinite(lat)||!isFinite(lng)||Math.abs(lat)>90||Math.abs(lng)>180){err.textContent='القيم خارج النطاق — راجع نظام الإحداثيات.';return;}
+    }
+    var used=data.points.map(function(p){return p.color;});
+    var color=PALETTE.find(function(c){return used.indexOf(c)<0;})||PALETTE[data.points.length%PALETTE.length];
+    var row={name:$('#a_name',ov).value.trim()||'نقطة جديدة',color:color,lat:lat,lng:lng};
+    ov.close();
+    var ok=await run('جارٍ إضافة النقطة',async function(){ck(await sb.from('points').insert(row));});
+    if(!ok)return;
+    map.flyTo([lat,lng],16,{duration:2.6});
+    if(lat<21||lat>32.5||lng<24||lng>37)toast('تنبيه: النقطة خارج حدود مصر — راجع نظام الإحداثيات إن لم يكن ذلك مقصودًا.',6000);
+    else toast('تمت إضافة النقطة — عدّل بياناتها من أيقونة القلم');
+  };
+}
+
+/* ---------- السيرة الذاتية ---------- */
+async function showCV(){
+  var cv=data.cv;
+  if(!cv){modal('<h2>'+I.doc+' السيرة الذاتية</h2><p class="mut">لم يتم رفع السيرة الذاتية بعد.</p>',{cls:'sm'});return;}
+  var isPdf=/pdf/i.test(cv.type)||/\.pdf$/i.test(cv.name),isDocx=/\.docx$/i.test(cv.name),url=null,blob=null;
+  var ov=modal('<h2>'+I.doc+' السيرة الذاتية</h2><div class="cvbar"><span class="an" dir="auto">'+esc(cv.name)+'</span>'+(isPdf?'<button class="btn" id="cv_open">فتح في نافذة</button>':'')+'<button class="btn pri" id="cv_dl">'+I.down+' تحميل</button></div><div id="cv_view" class="cvview doc">جارٍ التحميل…</div>',{cls:'xl',onClose:function(){if(url)URL.revokeObjectURL(url);}});
+  var v=$('#cv_view',ov);
+  $('#cv_dl',ov).onclick=function(){if(blob)saveBlob(blob,cv.name);else window.open(cv.url,'_blank');};
+  try{
+    var res=await fetch(cv.url);if(!res.ok)throw new Error('http');
+    blob=await res.blob();
+  }catch(e){v.textContent='تعذّر تحميل الملف.';return;}
+  if(isPdf){
+    blob=new Blob([blob],{type:'application/pdf'});
+    url=URL.createObjectURL(blob);
+    v.classList.remove('doc');v.innerHTML='<iframe title="السيرة الذاتية" src="'+url+'"></iframe>';
+    $('#cv_open',ov).onclick=function(){window.open(url,'_blank');};
+  }else if(isDocx&&window.mammoth){
+    try{var r=await mammoth.convertToHtml({arrayBuffer:await blob.arrayBuffer()});v.innerHTML=r.value;}
+    catch(e){v.textContent='تعذّرت معاينة الملف. يمكنك تحميله.';}
+  }else{
+    v.textContent='معاينة هذا النوع غير متاحة — اضغط «تحميل» لفتح الملف.';
+  }
+}
+
+/* ---------- دخول المالك (Supabase Auth) ---------- */
+var fails=0,lockUntil=0;
+function login(){
+  var ov=modal('<h2>'+I.lock+' المطور والمالك</h2><p class="mut">هذه المنطقة خاصة بصاحب الصفحة. سجّل الدخول للمتابعة.</p><div class="form"><label>البريد الإلكتروني<input id="em" type="email" autocomplete="username" dir="ltr"></label><label>كلمة المرور<input id="pw" type="password" autocomplete="current-password" dir="ltr"></label></div><div class="err" id="pw_err"></div><div class="acts"><button class="btn pri" id="pw_ok">دخول</button></div>',{cls:'sm'});
+  var em=$('#em',ov),pw=$('#pw',ov),err=$('#pw_err',ov);em.focus();
+  var go=async function(){
+    var now=Date.now();
+    if(now<lockUntil){err.textContent='محاولات كثيرة. انتظر '+Math.ceil((lockUntil-now)/1000)+' ثانية.';return;}
+    err.textContent='جارٍ التحقق…';
+    var r=await sb.auth.signInWithPassword({email:em.value.trim(),password:pw.value});
+    if(r.error){
+      fails++;if(fails>=3){lockUntil=Date.now()+15000;fails=0;}
+      err.textContent='البريد أو كلمة المرور غير صحيحة.';
+      var d=$('.dlg',ov);d.classList.remove('shake');void d.offsetWidth;d.classList.add('shake');pw.select();
+    }else{
+      owner=true;ov.close();renderPanel();setPanel(true);toast('تم الدخول — وضع المطور والمالك مفعّل');
+    }
+  };
+  $('#pw_ok',ov).onclick=go;
+  pw.addEventListener('keydown',function(e){if(e.key==='Enter')go();});
+}
+function changePass(){
+  var ov=modal('<h2>'+I.lock+' تغيير كلمة المرور</h2><div class="form"><label>كلمة المرور الجديدة (8 أحرف على الأقل)<input id="np" type="password" dir="ltr" autocomplete="new-password"></label></div><div class="err" id="np_err"></div><div class="acts"><button class="btn pri" id="np_ok">حفظ</button></div>',{cls:'sm'});
+  $('#np_ok',ov).onclick=async function(){
+    var v=$('#np',ov).value;
+    if(v.length<8){$('#np_err',ov).textContent='كلمة المرور قصيرة.';return;}
+    var r=await sb.auth.updateUser({password:v});
+    if(r.error){$('#np_err',ov).textContent='تعذّر التغيير: '+r.error.message;return;}
+    ov.close();toast('تم تغيير كلمة المرور');
+  };
+}
+async function logout(){await sb.auth.signOut();owner=false;renderPanel();toast('تم تسجيل الخروج');}
+
+/* ---------- العمود الجانبي ---------- */
+var panel=$('#panel'),handle=$('#handle'),panelOpen=false,open={points:false,brief:false},exp=null;
+function setPanel(v){
+  panelOpen=v;panel.classList.toggle('open',v);handle.classList.toggle('open',v);handle.setAttribute('aria-expanded',v);
+}
+handle.innerHTML=I.ribbon+'<span>ملف المهندس</span>'+I.chev;
+handle.onclick=function(){setPanel(!panelOpen);};
+
+function sec(key,icon,title,body){
+  return '<div class="sec'+(open[key]?' open':'')+'"><button class="sh" data-a="sec" data-k="'+key+'">'+icon+'<span>'+title+'</span><i>'+I.chev+'</i></button><div class="sb">'+body+'</div></div>';
+}
+function pointsHTML(){
+  var h='';
+  if(owner)h+='<div class="addrow"><button class="addbtn" data-a="addpt" title="إضافة نقطة" aria-label="إضافة نقطة">'+I.plus+'</button><span class="mut sm">إضافة نقطة جديدة بالإحداثيات</span></div>';
+  if(!data.points.length)return h+'<p class="mut">لا توجد نقاط بعد.</p>';
+  return h+data.points.map(function(p){
+    return '<div class="pt'+(exp===p.id?' open':'')+'"><div class="prow"><button class="pmain" data-a="exp" data-id="'+p.id+'"><span class="dot" style="background:'+esc(p.color)+'"></span><span class="pn" dir="auto">'+esc(p.name)+'</span><i>'+I.chev+'</i></button>'+(owner?'<button class="ib" data-a="edit" data-id="'+p.id+'" title="تعديل" aria-label="تعديل">'+I.pencil+'</button>':'')+'</div><div class="opts"><button data-a="goto" data-id="'+p.id+'">الذهاب إلى النقطة</button><button data-a="details" data-id="'+p.id+'">تفاصيل</button></div></div>';
+  }).join('');
+}
+function ownerTools(){
+  return '<div class="otools"><div class="lbl">أدوات المطور والمالك</div>'+
+  '<div class="cvrow"><span>السيرة الذاتية: <b dir="auto">'+(data.cv?esc(data.cv.name):'لم تُرفع بعد')+'</b></span><button class="ib pri" data-a="cvup" title="رفع السيرة الذاتية (PDF / Word)" aria-label="رفع السيرة الذاتية">'+I.plus+'</button>'+(data.cv?'<button class="ib dng" data-a="cvdel" title="حذف السيرة الذاتية" aria-label="حذف السيرة الذاتية">'+I.trash+'</button>':'')+'</div>'+
+  '<div class="mut sm">كل تعديل يُحفظ مباشرةً ويظهر لكل من يفتح الرابط.</div>'+
+  '<div class="row2"><button class="btn ghost sm" data-a="chpass">تغيير كلمة المرور</button><button class="btn ghost sm" data-a="logout">'+I.out+' خروج</button></div></div>';
+}
+function renderPanel(){
+  var top=panel.scrollTop;
+  var brief=(data.brief&&data.brief.trim())?data.brief:'هذه الخريطة توضح المناطق والشركات التي سبق وعمل بها المهندس '+data.name.replace(/^\s*م\.?\s*/,'');
+  var h='<div class="who"><h1 dir="auto">'+esc(data.name)+'</h1>'+(owner?'<button class="ib" data-a="editname" title="تعديل الاسم" aria-label="تعديل الاسم">'+I.pencil+'</button>':'')+'</div>';
+  if(owner)h+='<div class="badge">وضع المطور والمالك</div>';
+  h+=sec('points',I.list,'قائمة النقاط',pointsHTML());
+  h+=sec('brief',I.info,'موجز','<p class="pre">'+esc(brief)+'</p>'+(owner?'<button class="btn ghost sm" data-a="editbrief">'+I.pencil+' تعديل الموجز</button>':''));
+  if(owner)h+=ownerTools();
+  panel.innerHTML=h;panel.scrollTop=top;
+}
+panel.addEventListener('click',function(e){
+  var b=e.target.closest('[data-a]');if(!b)return;
+  var a=b.dataset.a,id=b.dataset.id;
+  if(a==='sec'){open[b.dataset.k]=!open[b.dataset.k];renderPanel();}
+  else if(a==='exp'){exp=(exp===id)?null:id;renderPanel();}
+  else if(a==='goto')goTo(id);
+  else if(a==='details')showDetails(id);
+  else if(!owner)return;
+  else if(a==='edit')editPoint(id);
+  else if(a==='addpt')addPoint();
+  else if(a==='editname')ask('اسم صاحب الخريطة',data.name,false).then(function(v){
+    if(v!==null&&v.trim())run('جارٍ الحفظ',async function(){ck(await sb.from('site_settings').upsert({id:1,owner_name:v.trim(),updated_at:new Date().toISOString()}));});
+  });
+  else if(a==='editbrief')ask('الموجز (اتركه فارغًا لاستخدام النص الافتراضي)',data.brief||'',true).then(function(v){
+    if(v!==null)run('جارٍ الحفظ',async function(){ck(await sb.from('site_settings').upsert({id:1,brief:v.trim(),updated_at:new Date().toISOString()}));});
+  });
+  else if(a==='cvup')pick('.pdf,.doc,.docx',false).then(function(fs){
+    var f=fs[0];if(!f)return;
+    if(!/\.(pdf|docx?)$/i.test(f.name)){toast('ارفع ملف PDF أو Word فقط.');return;}
+    if(f.size>MAX){toast('الملف أكبر من 20MB.');return;}
+    var old=data.cv&&data.cv.path;
+    run('جارٍ رفع السيرة الذاتية',async function(){
+      var path=await upload(f,'cv');
+      ck(await sb.from('site_settings').upsert({id:1,cv_path:path,cv_name:f.name,cv_type:f.type||'',updated_at:new Date().toISOString()}));
+      if(old)await removeFiles([old]);
+    });
+  });
+  else if(a==='cvdel'){
+    if(!confirm('حذف السيرة الذاتية الحالية؟'))return;
+    var old=data.cv&&data.cv.path;
+    run('جارٍ الحذف',async function(){
+      ck(await sb.from('site_settings').upsert({id:1,cv_path:null,cv_name:null,cv_type:null,updated_at:new Date().toISOString()}));
+      if(old)await removeFiles([old]);
+    });
+  }
+  else if(a==='chpass')changePass();
+  else if(a==='logout')logout();
+});
+
+/* ---------- الشريط السفلي (الأيقونات الثلاث) ---------- */
+var nav=$('#nav');
+nav.innerHTML='<button data-n="owner" title="المطور والمالك">'+I.lock+'<span>المطور والمالك</span></button><button data-n="map" class="on" title="عرض الخريطة">'+I.map+'<span>عرض الخريطة</span></button><button data-n="cv" title="السيرة الذاتية">'+I.doc+'<span>CV</span></button>';
+nav.addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;
+  var n=b.dataset.n;
+  if(n==='owner'){if(owner){setPanel(true);toast('وضع المطور والمالك مفعّل');}else login();}
+  else if(n==='map'){document.querySelectorAll('.ov').forEach(function(o){o.close();});fitAll(true);}
+  else if(n==='cv')showCV();
+});
+
+/* ---------- تشغيل ---------- */
+setBase('imagery_l');
+renderPanel();
+toast('جارٍ تحميل البيانات…',20000);
+sb.auth.getSession().then(function(r){owner=!!(r.data&&r.data.session);renderPanel();});
+sb.auth.onAuthStateChange(function(ev,s){var o=!!s;if(o!==owner){owner=o;renderPanel();}});
+load().then(function(ok){if(ok){fitAll(false);$('#toast').classList.remove('on');}});
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'&&!document.querySelector('.ov'))load();});
+})();
+</script>
+</body>
+</html>
